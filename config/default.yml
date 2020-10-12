@@ -1,0 +1,17 @@
+ticketApi:
+  - URL: https://am.nhsidentity.refspineservices.nhs
+    IsActive: true
+  - URL: https://am.nhsidentity.spineservices.nhs.uk
+    IsActive: false
+  - URL: https://localhost:5010
+    IsActive: true
+  - URL: https://localhost:5011
+    IsActive: false
+CMS:
+  - URL: https://localhost:5010
+    IsActive: true
+  - URL: http://localhost:5010
+    IsActive: false
+Test:
+  - URL: https://localhost:5030
+    IsActive: true

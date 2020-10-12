@@ -1,0 +1,5 @@
+ticketApi:
+  - URL: https://www.aws.training/
+    IsActive: true
+  - URL: https://en.wikipedia.org/wiki/YAMw
+    IsActive: true
