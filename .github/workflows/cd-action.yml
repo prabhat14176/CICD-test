@@ -4,8 +4,6 @@ name: Continuous Deploy action
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
     
 jobs:
   Terraform:
