@@ -1,0 +1,65 @@
+
+name: Continuous Deploy action
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    
+jobs:
+  Terraform:
+    name: Terraform Plan & Apply
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+
+    - name: Terraform Setup
+      uses: hashicorp/setup-terraform@v1
+      
+    - name: Terraform Init
+      run: terraform init
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TF_ACTION_WORKING_DIR: '.'
+        AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        
+    - name: Terraform validate
+      run: terraform validate
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TF_ACTION_WORKING_DIR: '.'
+        AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Run Python script
+      run: |
+        python url_allow_lister/application.py
+
+    - name: Deploy to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args:  --acl public-read --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'eu-west-2'
+        SOURCE_DIR: 'output'      # optional: defaults to entire repository
+
+    - name: Tidy up
+      run: if [ -d output ]; then rm -rf output; fi
