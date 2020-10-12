@@ -17,3 +17,5 @@ Test:
     IsActive: true
   - URL: https://localhost:5130
     IsActive: false
+  - URL: https://nhs.net
+    IsActive: true
